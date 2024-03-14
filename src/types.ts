@@ -1,7 +1,19 @@
 export interface PropsRowLetters {
   disabled?: boolean;
   keyCode?: string;
-  order: number;
+}
+
+export interface PropsRowLetter {
+  value: string;
+  state: StateRowLetter;
+}
+
+export interface IRowLetters extends PropsRowLetters {
+  id: string;
+}
+
+export interface IRowLetter extends PropsRowLetter {
+  id: string;
 }
 
 export enum StateRowLetter {
@@ -10,11 +22,3 @@ export enum StateRowLetter {
   CORRECT = 'correct',
   ELSEWHERE = 'elsewhere',
 }
-
-export interface PropsRowLetter {
-  id: string;
-  value: string;
-  state: StateRowLetter;
-}
-
-export type IRowLetter = PropsRowLetter;

@@ -1,6 +1,5 @@
 <template>
   <div
-    :id="props.id"
     class="row-letter"
     :class="stateClass"
   >
@@ -53,11 +52,13 @@ const stateClass = computed<string>(() => `row-letter-${props.state}`);
 .show-enter-active,
 .show-leave-active {
   opacity: 1;
-  transition: opacity 0.5s ease;
+  transform: scale(1);
+  transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
 .show-enter-from,
 .show-leave-to {
   opacity: 0;
+  transform: scale(0.2);
 }
 </style>

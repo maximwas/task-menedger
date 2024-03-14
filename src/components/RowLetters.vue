@@ -1,24 +1,25 @@
 <template>
   <div class="row">
     <RowLetter
-      v-for="index in 5"
-      v-bind="getLetter(index)"
-      :key="rowLetters[index - 1]?.id || uniqueId()"
+      v-for="rowLetter in rowLetters"
+      :key="rowLetter.id"
+      :value="rowLetter.value"
+      :state="rowLetter.state"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { reactive, watch, ref } from 'vue';
 import { storeToRefs } from 'pinia';
-import { useEventListener } from '@vueuse/core';
-
-import RowLetter from '@/components/RowLetter.vue';
 
 import { StateRowLetter } from '@/types';
 import type { PropsRowLetters, IRowLetter } from '@/types';
 
 import { useWord } from '@/stores/word';
+import { uniqueId } from '@/utils';
+
+import RowLetter from '@/components/RowLetter.vue';
 
 const props = withDefaults(defineProps<PropsRowLetters>(), {
   disabled: true,
@@ -28,67 +29,61 @@ const emit = defineEmits(['correct', 'incorrect']);
 const store = useWord();
 const { setItemInHistory } = store;
 const { answer } = storeToRefs(store);
-const rowLetters = reactive<IRowLetter[]>([]);
 
-const cleanupForAddLetter = useEventListener(document, 'keydown', handlerKeydown(addLetter));
-const cleanupForDeleteLetter = useEventListener(document, 'keydown', handlerKeydown(deleteLetter));
-const cleanupForCheckAccuracyWord = useEventListener(document, 'keydown', handlerKeydown(checkAccuracyWord));
+const currentRowLetterIndex = ref<number>(0);
+const rowLetters = reactive<IRowLetter[]>(getFillRowLetters());
 
-function uniqueId(): string {
-  return Math.random().toString(36).substring(2);
-}
+watch(() => props.keyCode, (keyCode) => {
+  if (keyCode) {
+    addLetter(keyCode);
+    deleteLetter(keyCode);
+    checkAccuracyWord(keyCode);
+  }
+});
 
-function getLetter(index: number) {
-  const defaultLetter = {
+function getFillRowLetters() {
+  return [...new Array(5)].map(() => ({
     id: uniqueId(),
     value: '',
     state: StateRowLetter.DEFAULT,
-  };
-
-  return rowLetters[index - 1] || defaultLetter;
+  }));
 }
 
-function handlerKeydown(callback: (key: string) => void) {
-  return (event: KeyboardEvent) => {
-    const key = event.key.toLowerCase();
-
-    if (!props.disabled) {
-      callback(key);
-    }
-  };
-}
-
-function addLetter(key: string) {
+function addLetter(keyCode: string) {
+  const key = getKeyWithoutId(keyCode);
   const isUaAlphabetic = key >= 'а' && key <= 'я';
 
-  if (isUaAlphabetic && rowLetters.length < 5) {
-    rowLetters.push({
-      id: uniqueId(),
-      value: key,
-      state: StateRowLetter.DEFAULT,
-    });
+  if (isUaAlphabetic && currentRowLetterIndex.value !== 5) {
+    rowLetters[currentRowLetterIndex.value].value = key;
+    currentRowLetterIndex.value += 1;
   }
 }
 
-function deleteLetter(key: string) {
+function deleteLetter(keyCode: string) {
+  const key = getKeyWithoutId(keyCode);
   const isBackspaceOrDelete = key === 'backspace' || key === 'delete';
 
-  if (isBackspaceOrDelete) {
-    rowLetters.pop();
+  if (isBackspaceOrDelete && currentRowLetterIndex.value !== 0) {
+    rowLetters[currentRowLetterIndex.value - 1].value = '';
+    currentRowLetterIndex.value -= 1;
   }
 }
 
-function checkAccuracyWord(key: string) {
+function checkAccuracyWord(keyCode: string) {
+  const key = getKeyWithoutId(keyCode);
   const isEnter = key === 'enter';
 
-  if (isEnter && rowLetters.length === 5) {
-    cleanupForAddLetter();
-    cleanupForDeleteLetter();
-    cleanupForCheckAccuracyWord();
+  if (isEnter && currentRowLetterIndex.value === 5) {
+    currentRowLetterIndex.value = 0;
+
     checkValidAnswer();
     checkRowLettersCorrect();
     setItemInHistory(rowLetters);
   }
+}
+
+function getKeyWithoutId(keyCode: string) {
+  return keyCode.split('_')[0];
 }
 
 function checkValidAnswer() {
@@ -115,10 +110,10 @@ function checkRowLettersCorrect() {
   const isCorrect = rowLetters.every((letter) => letter.state === StateRowLetter.CORRECT);
 
   if (isCorrect) {
-    return emit('correct', props.order);
+    return emit('correct');
   }
 
-  return emit('incorrect', props.order);
+  return emit('incorrect');
 }
 
 </script>

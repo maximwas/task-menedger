@@ -1,42 +1,63 @@
 <template>
   <div id="game">
     <RowLetters
-      v-for="(rowLetter, index) in rowLetters"
+      v-for="rowLetter in rowLetters"
       :key="rowLetter.id"
       :disabled="rowLetter.disabled"
-      :order="index"
+      :key-code="rowLetter.keyCode"
       @incorrect="incorrect"
+      @correct="correct"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { onDeactivated, reactive, ref } from 'vue';
+import { useEventListener } from '@vueuse/core';
+
+import { uniqueId } from '@/utils';
 
 import RowLetters from '@/components/RowLetters.vue';
+import type { IRowLetters } from './types';
 
-const rowLetters = reactive([
+const currentRowLetter = ref<number>(0);
+const rowLetters = reactive<IRowLetters[]>([
   { id: uniqueId(), disabled: false },
-  { id: uniqueId(), disabled: true },
-  { id: uniqueId(), disabled: true },
-  { id: uniqueId(), disabled: true },
-  { id: uniqueId(), disabled: true },
-  { id: uniqueId(), disabled: true },
+  { id: uniqueId() },
+  { id: uniqueId() },
+  { id: uniqueId() },
+  { id: uniqueId() },
+  { id: uniqueId() },
 ]);
 
-function uniqueId(): string {
-  return Math.random().toString(36).substring(2);
+const cleanup = useEventListener(document, 'keydown', handlerKeydown);
+
+function handlerKeydown(event: KeyboardEvent) {
+  const key = event.key.toLowerCase();
+
+  if (currentRowLetter.value < rowLetters.length) {
+    rowLetters[currentRowLetter.value].keyCode = `${key}_${uniqueId()}`;
+  } else {
+    cleanup();
+  }
 }
 
-function incorrect(index: number) {
-  const nextIndex = index + 1;
+function incorrect() {
+  const nextIndex = currentRowLetter.value + 1;
 
   if (nextIndex < rowLetters.length) {
     rowLetters[nextIndex].disabled = false;
   }
 
-  rowLetters[index].disabled = true;
+  rowLetters[currentRowLetter.value].disabled = true;
+  currentRowLetter.value = nextIndex;
 }
+
+function correct() {
+  cleanup();
+}
+
+onDeactivated(cleanup);
 </script>
 
 <style scoped>
