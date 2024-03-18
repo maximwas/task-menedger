@@ -1,0 +1,29 @@
+:root {
+  --color-text-main: #393e4c;
+  --color-state-absent: #a4aec4;
+  --color-state-correct: #79b851;
+  --color-state-elsewhere: #f3c237;
+
+  --background-primary: #ffffff;
+  --background-secondary: #fbfcff;
+  --background-keyboard: #dce1ed;
+  --background-modal: #ffffff;
+  --background-hover: #c4cbdd;
+
+  --border-letter: #dee1e9;
+}
+
+body.dark {
+  --color-text-main: #ffffff;
+  --color-state-absent: #a4aec4;
+  --color-state-correct: #79b851;
+  --color-state-elsewhere: #f3c237;
+
+  --background-primary: #2b2d3c;
+  --background-secondary: #191a24;
+  --background-keyboard: #656780;
+  --background-modal: #2b2d3c;
+  --background-hover: #c4cbdd;
+
+  --border-letter: #414458;
+}

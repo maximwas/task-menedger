@@ -1,7 +1,7 @@
 <template>
   <div
     class="row-letter"
-    :class="stateClass"
+    :class="`state-${props.state}`"
   >
     <Transition name="show">
       <span v-if="props.value">{{ props.value }}</span>
@@ -10,43 +10,26 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import type { PropsRowLetter } from '@/types';
+import { type PropsRowLetter } from '@/types';
 
 const props = defineProps<PropsRowLetter>();
-const stateClass = computed<string>(() => `row-letter-${props.state}`);
 </script>
 
 <style scoped>
 .row-letter {
   width: 50px;
   height: 50px;
-  border-radius: 10px;
-  margin-left: 10px;
+  border-radius: 5px;
+  margin-left: 7px;
+  color: var(--color-text-main);
+  background: var(--background-secondary);
+  border: 2px solid var(--border-letter);
   display: flex;
   justify-content: center;
   align-items: center;
-  pointer-events: none;
-}
-
-.row-letter-default {
-  background-color: #ffffff;
-  color: #000000;
-}
-
-.row-letter-absent {
-  background-color: #a4aec4;
-  color: #ffffff;
-}
-
-.row-letter-correct {
-  background-color: #79b851;
-  color: #ffffff;
-}
-
-.row-letter-elsewhere {
-  background-color: #f3c237;
-  color: #ffffff;
+  user-select: none;
+  text-transform: uppercase;
+  font-size: 20px;
 }
 
 .show-enter-active,

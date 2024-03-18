@@ -10,11 +10,14 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, watch, ref } from 'vue';
+import {
+  reactive, watch, ref, computed, toValue,
+} from 'vue';
 import { storeToRefs } from 'pinia';
 
-import { StateRowLetter } from '@/types';
-import type { PropsRowLetters, IRowLetter } from '@/types';
+import {
+  StateRowLetter, type PropsRowLetters, type IRowLetter, type Word,
+} from '@/types';
 
 import { useWord } from '@/stores/word';
 import { uniqueId } from '@/utils';
@@ -23,21 +26,30 @@ import RowLetter from '@/components/RowLetter.vue';
 
 const props = withDefaults(defineProps<PropsRowLetters>(), {
   disabled: true,
+  keyCode: '',
 });
-const emit = defineEmits(['correct', 'incorrect']);
+const emit = defineEmits(['correct', 'incorrect', 'incorrect-word']);
 
 const store = useWord();
-const { setItemInHistory } = store;
+const { setItemInHistory, isHaveThisWord } = store;
 const { answer } = storeToRefs(store);
 
 const currentRowLetterIndex = ref<number>(0);
 const rowLetters = reactive<IRowLetter[]>(getFillRowLetters());
+const word = computed<Word>(() => rowLetters.map((rowLetter) => rowLetter.value).join(''));
 
 watch(() => props.keyCode, (keyCode) => {
-  if (keyCode) {
-    addLetter(keyCode);
-    deleteLetter(keyCode);
-    checkAccuracyWord(keyCode);
+  const key = getKeyWithoutId(keyCode);
+  const isEnter = key === 'enter';
+  const isUaAlphabetic = /[а-яА-ЯЄєІіЇїҐґ]/.test(key);
+  const isBackspaceOrDelete = key === 'backspace' || key === 'delete';
+
+  if (isEnter) {
+    checkAccuracyWord();
+  } else if (isBackspaceOrDelete) {
+    deleteLetter();
+  } else if (isUaAlphabetic) {
+    addLetter(key);
   }
 });
 
@@ -49,37 +61,39 @@ function getFillRowLetters() {
   }));
 }
 
-function addLetter(keyCode: string) {
-  const key = getKeyWithoutId(keyCode);
-  const isUaAlphabetic = key >= 'а' && key <= 'я';
-
-  if (isUaAlphabetic && currentRowLetterIndex.value !== 5) {
+function addLetter(key: string) {
+  if (currentRowLetterIndex.value !== 5) {
     rowLetters[currentRowLetterIndex.value].value = key;
     currentRowLetterIndex.value += 1;
   }
+  return null;
 }
 
-function deleteLetter(keyCode: string) {
-  const key = getKeyWithoutId(keyCode);
-  const isBackspaceOrDelete = key === 'backspace' || key === 'delete';
-
-  if (isBackspaceOrDelete && currentRowLetterIndex.value !== 0) {
+function deleteLetter() {
+  if (currentRowLetterIndex.value !== 0) {
     rowLetters[currentRowLetterIndex.value - 1].value = '';
     currentRowLetterIndex.value -= 1;
   }
+
+  return null;
 }
 
-function checkAccuracyWord(keyCode: string) {
-  const key = getKeyWithoutId(keyCode);
-  const isEnter = key === 'enter';
+function checkAccuracyWord() {
+  const isHaveWord = isHaveThisWord(toValue(word));
 
-  if (isEnter && currentRowLetterIndex.value === 5) {
+  if (currentRowLetterIndex.value === 5) {
+    if (!isHaveWord) {
+      return emit('incorrect-word');
+    }
+
     currentRowLetterIndex.value = 0;
 
     checkValidAnswer();
     checkRowLettersCorrect();
     setItemInHistory(rowLetters);
   }
+
+  return null;
 }
 
 function getKeyWithoutId(keyCode: string) {
@@ -121,6 +135,6 @@ function checkRowLettersCorrect() {
 <style scoped>
 .row {
   display: flex;
-  margin: 5px 0;
+  margin: 7px 0;
 }
 </style>

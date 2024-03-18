@@ -1,4 +1,3 @@
-
 <template>
   <div />
 </template>
@@ -7,6 +6,6 @@
 
 </script>
 
-<style lang="">
+<style scoped>
 
 </style>
