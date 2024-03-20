@@ -30,6 +30,11 @@ const props = defineProps<PropsRowLetter>();
   user-select: none;
   text-transform: uppercase;
   font-size: 20px;
+  transition: 0.3s linear;
+}
+
+.row-letter:first-child {
+  margin-left: 0;
 }
 
 .show-enter-active,

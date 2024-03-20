@@ -37,12 +37,10 @@ const { history } = storeToRefs(store);
 watch(history, (newValueHistory) => {
   keyBoards.forEach((keyBoard) => {
     keyBoard.forEach((key) => {
-      newValueHistory.forEach((rowLetters) => {
-        rowLetters.forEach((rowLetter) => {
-          if (rowLetter.value === key.key) {
-            key.state = rowLetter.state;
-          }
-        });
+      newValueHistory.forEach((item) => {
+        if (item.value === key.key) {
+          key.state = item.state;
+        }
       });
     });
   });
@@ -100,10 +98,10 @@ function handlerClick(key: IKeyBoard) {
   padding: 3px;
   text-decoration: inherit;
   text-transform: capitalize;
-  transition: .2s;
+  transition: 0.3s linear;
 }
 
 .key-board-button:hover {
-  background: var(--background-hover);
+  --background-keyboard: var(--background-hover);
 }
 </style>
