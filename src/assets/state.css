@@ -1,14 +1,14 @@
 #app .state-absent {
   background-color: var(--color-state-absent);
-  color: var(--color-text-main);
+  color: var(--color-state);
 }
 
 #app .state-correct {
   background-color: var(--color-state-correct);
-  color: var(--color-text-main);
+  color: var(--color-state);
 }
 
 #app .state-elsewhere {
   background-color: var(--color-state-elsewhere);
-  color: var(--color-text-main);
+  color: var(--color-state);
 }

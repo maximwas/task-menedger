@@ -8,13 +8,13 @@ import { words } from '../words.json';
 
 export const useWord = defineStore('word', () => {
   const answer = ref<Answer>('');
-  const history = reactive<IRowLetter[][]>([]);
+  const history = reactive<IRowLetter[]>([]);
 
   function setItemInHistory(rowLetters: IRowLetter[]) {
-    history.push(rowLetters);
+    history.push(...rowLetters);
   }
 
-  function getItemInHistory(index: number): IRowLetter[] {
+  function getItemInHistory(index: number): IRowLetter {
     return history[index];
   }
 

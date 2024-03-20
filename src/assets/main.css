@@ -1,12 +1,3 @@
-@import './base.css';
-@import './state.css';
-@import './variables.css';
-
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-weight: normal;
-  display: flex;
-  justify-content: center;
-}
+@import "./base.css";
+@import "./state.css";
+@import "./variables.css";

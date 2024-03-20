@@ -1,5 +1,6 @@
 :root {
   --color-text-main: #393e4c;
+  --color-state: #ffffff;
   --color-state-absent: #a4aec4;
   --color-state-correct: #79b851;
   --color-state-elsewhere: #f3c237;
@@ -11,9 +12,13 @@
   --background-hover: #c4cbdd;
 
   --border-letter: #dee1e9;
+
+  --switch-button-color: #dbe0ed;
+  --switch-button-active-color: #656780;
+  --switch-button-cycle-color: #ffffff;
 }
 
-body.dark {
+[data-theme="dark"] {
   --color-text-main: #ffffff;
   --color-state-absent: #a4aec4;
   --color-state-correct: #79b851;
@@ -26,4 +31,8 @@ body.dark {
   --background-hover: #c4cbdd;
 
   --border-letter: #414458;
+
+  --switch-button-color: #40445c;
+  --switch-button-active-color: #656780;
+  --switch-button-cycle-color: #ffffff;
 }
